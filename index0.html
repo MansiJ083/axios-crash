@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <form id="appointmentForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" required>
+
+        <button type="button" onclick="bookAppointment()">Book Appointment</button>
+    </form>
+
+    <script>
+        function bookAppointment() {
+            // Get input values
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            var phone = document.getElementById('phone').value;
+
+            // Create an object with appointment data
+            var appointmentData = {
+                name: name,
+                email: email,
+                phone: phone
+            };
+
+            // Make a POST request to crudcrud.com
+            axios.post('https://crudcrud.com/api/3cdf0d933b6f41399edbc1eefb075933/bookingAppointment', appointmentData)
+                .then(response => {
+                    console.log('POST request successful:', response.data);
+                    alert('Appointment booked successfully!');
+                })
+                .catch(error => {
+                    console.error('Error making POST request:', error);
+                    alert('Failed to book appointment. Please try again.');
+                });
+        }
+    </script>
+
+</body>
+
+</html>

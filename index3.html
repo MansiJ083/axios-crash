@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body onload="getAppointments()">
+
+    <form id="appointmentForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" required>
+
+        <button type="button" onclick="bookAppointment()">Book Appointment</button>
+    </form>
+
+    <div id="userDetails">
+        <h2>Appointments:</h2>
+        <div id="userData"></div>
+    </div>
+
+    <script>
+        function bookAppointment() {
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            var phone = document.getElementById('phone').value;
+
+            axios.post('https://crudcrud.com/api/3cdf0d933b6f41399edbc1eefb075933/bookingAppointment', {
+                name: name,
+                email: email,
+                phone: phone
+            })
+                .then(response => {
+                    console.log('POST request successful:', response.data);
+                    alert('Appointment booked successfully!');
+                    getAppointments(); // Update the displayed appointments after booking
+                })
+                .catch(error => {
+                    console.error('Error making POST request:', error);
+                    alert('Failed to book appointment. Please try again.\nSee console for error details.');
+                });
+        }
+
+        function getAppointments() {
+            axios.get('https://crudcrud.com/api/3cdf0d933b6f41399edbc1eefb075933/bookingAppointment')
+                .then(response => {
+                    console.log('GET request successful:', response.data);
+                    displayAppointments(response.data);
+                })
+                .catch(error => {
+                    console.error('Error making GET request:', error);
+                    alert('Failed to retrieve appointments.\nSee console for error details.');
+                });
+        }
+
+        function displayAppointments(appointments) {
+            var userDataDiv = document.getElementById('userData');
+            userDataDiv.innerHTML = ''; // Clear previous data
+
+            appointments.forEach(appointment => {
+                var appointmentDiv = document.createElement('div');
+                appointmentDiv.textContent = `Name: ${appointment.name}, Email: ${appointment.email}, Phone: ${appointment.phone}`;
+
+                // Add a delete button
+                var deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = function () {
+                    deleteAppointment(appointment._id);
+                };
+
+                // Append delete button to user detail
+                appointmentDiv.appendChild(deleteButton);
+
+                // Append user detail to userDataDiv
+                userDataDiv.appendChild(appointmentDiv);
+            });
+        }
+
+        function deleteAppointment(appointmentId) {
+            // Make a DELETE request to CRUD CRUD
+            axios.delete(`https://crudcrud.com/api/3cdf0d933b6f41399edbc1eefb075933/bookingAppointment/${appointmentId}`)
+                .then(response => {
+                    console.log('DELETE request successful:', response.data);
+                    alert('Appointment deleted successfully!');
+                    getAppointments(); // Update the displayed appointments after deletion
+                })
+                .catch(error => {
+                    console.error('Error making DELETE request:', error);
+                    alert('Failed to delete appointment. Please try again.\nSee console for error details.');
+                });
+        }
+    </script>
+
+</body>
+
+</html>

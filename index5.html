@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.3/axios.min.js"></script>
+  </head>
+  <body style="margin: 0">
+    <form onsubmit="handleFormSubmit(event)">
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" />
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" />
+      <label for="phone">Phone No</label>
+      <input type="tel" name="phone" id="phone" />
+      <button type="submit">Submit</button>
+    </form>
+    <ul id="userList"></ul>
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+        
+            var username = document.getElementById('username').value;
+            var email = document.getElementById('email').value;
+            var phone = document.getElementById('phone').value;
+        
+            var userDetails = {
+                username: username,
+                email: email,
+                phone: phone
+            };
+            axios.post('https://crudcrud.com/api/15670de056d74884ac38914b42de8b49/bookingAppointment', userDetails)
+                .then(function (response) {
+                    console.log('Data stored in the cloud:', response.data);
+                    document.getElementById('username').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('phone').value = '';
+                    initUI();
+                })
+                .catch(function (error) {
+                    console.error('Error storing data in the cloud:', error);
+                });
+        }
+        
+        function initUI() {
+            axios.get('https://crudcrud.com/api/15670de056d74884ac38914b42de8b49/bookingAppointment')
+                .then(function (response) {
+                    var userDetailsArray = response.data;
+        
+                    var userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+        
+                    userDetailsArray.forEach(function (userDetails) {
+                        var listItem = document.createElement('li');
+        
+                        listItem.textContent = `Username: ${userDetails.username}, Email: ${userDetails.email}, Phone: ${userDetails.phone}`;
+        
+                        var deleteButton = document.createElement('button');
+                        deleteButton.innerHTML = 'Delete';
+                        deleteButton.style.cursor = 'pointer';
+                        deleteButton.onclick = function () {
+                            deleteUser(userDetails._id);
+                        };
+        
+                        var editButton = document.createElement('button');
+                        editButton.innerHTML = 'Edit';
+                        editButton.style.cursor = 'pointer';
+                        editButton.addEventListener('click', function () {
+                            editUser(userDetails);
+                        });
+        
+                        listItem.appendChild(deleteButton);
+                        listItem.appendChild(editButton);
+        
+                        userList.appendChild(listItem);
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Error fetching data from the cloud:', error);
+                });
+        }
+        
+        function deleteUser(userId) {
+            axios.delete(`https://crudcrud.com/api/15670de056d74884ac38914b42de8b49/bookingAppointment/${userId}`)
+                .then(function (response) {
+                    console.log('User deleted from the cloud:', response.data);
+                    initUI();
+                })
+                .catch(function (error) {
+                    console.error('Error deleting user from the cloud:', error);
+                });
+        }
+        
+        function editUser(userDetails) {
+            var currentUserId = userDetails._id;
+            deleteUser(currentUserId);
+        
+            document.getElementById('username').value = userDetails.username;
+            document.getElementById('email').value = userDetails.email;
+            document.getElementById('phone').value = userDetails.phone;
+        
+            axios.post('https://crudcrud.com/api/15670de056d74884ac38914b42de8b49/bookingAppointment', userDetails)
+                .then(function (response) {
+                    console.log('Data stored in the cloud:', response.data);
+                    initUI();
+                })
+                .catch(function (error) {
+                    console.error('Error storing data in the cloud:', error);
+                });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            initUI();
+        });
+    </script>
+  </body>
+</html>
